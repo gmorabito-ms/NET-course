@@ -1,14 +1,17 @@
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce1.Models.Dtos;
 using ApiEcommerce1.Repository.IRepository;
+using Asp.Versioning;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiEcommerce1.Controllers;
 
+[Authorize]
 [ApiController]
-[Route("api/[controller]")]
-
+[ApiVersionNeutral]
+[Route("api/v/{version:apiVersion}/[controller]")]
 public class UsersController : ControllerBase
 {
     private readonly IUserRepository _userRepository;
@@ -31,12 +34,12 @@ public class UsersController : ControllerBase
         return Ok(usersDto);
     }
 
-    [HttpGet("id:int", Name = "GetUser")]
+    [HttpGet("{id}", Name = "GetUser")]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public IActionResult GetUser(int id)
+    public IActionResult GetUser(string id)
     {
         var user = _userRepository.GetUser(id);
         if (user == null)
@@ -48,6 +51,7 @@ public class UsersController : ControllerBase
         return Ok(userDto);
     }
 
+    [AllowAnonymous]
     [HttpPost(Name = "RegisterUser")]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -76,6 +80,7 @@ public class UsersController : ControllerBase
     }
 
 
+    [AllowAnonymous]
     [HttpPost("Login", Name = "LoginUser")]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
